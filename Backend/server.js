@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }))
 
 //cors issue fixed
 app.use(cors({
-    origin: 'https://effortless-halva-51096c.netlify.app/',
+    origin: 'https://effortless-halva-51096c.netlify.app',
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 }));
