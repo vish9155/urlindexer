@@ -1,0 +1,46 @@
+         
+version: "3.9"
+
+services:
+
+  redis:
+    image: redis:7
+    container_name: indexer-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./Backend
+    container_name: indexer-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+    volumes:
+      - ./Backend:/app
+      - /app/node_modules
+    environment:
+      - REDIS_HOST=redis
+
+  worker:
+    build: ./Backend
+    container_name: indexer-worker
+    restart: always
+    command: node worker/indexWorker.js
+    depends_on:
+      - redis
+    volumes:
+      - ./Backend:/app
+      - /app/node_modules
+
+  frontend:
+    build: ./frontend
+    container_name: indexer-frontend
+    restart: always 
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules           
