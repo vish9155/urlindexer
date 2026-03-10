@@ -15,7 +15,7 @@ export default function Home() {
     ];
 
     try {
-      const res = await fetch("http://localhost:5000/url/add", {
+      const res = await fetch("http://usrailwaybooking.com/url/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

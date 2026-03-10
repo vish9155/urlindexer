@@ -16,7 +16,11 @@ app.use(express.urlencoded({ extended: true }))
 
 //cors issue fixed
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: [
+        "http://localhost:3000",
+        "http://usrailwaybooking.com",
+        "https://usrailwaybooking.com"
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 }));
