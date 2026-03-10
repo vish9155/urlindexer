@@ -22,8 +22,10 @@ app.use(cors({
         "https://usrailwaybooking.com"
     ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
+app.options("*", cors());
 
 // Database connection
 dbConect()
