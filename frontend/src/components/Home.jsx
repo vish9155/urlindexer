@@ -15,7 +15,11 @@ export default function Home() {
     ];
 
     try {
+<<<<<<< HEAD
       const res = await fetch("http://usrailwaybooking.com/url/add", {
+=======
+      const res = await fetch("https://urlindexer.onrender.com/url/add", {
+>>>>>>> 8f2b0498031c62c1624ecb66ebdf310dddaaf32f
         method: "POST",
         headers: {
           "Content-Type": "application/json"

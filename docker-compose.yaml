@@ -21,8 +21,8 @@ services:
     volumes:
       - ./Backend:/app
       - /app/node_modules
-    environment:
-      - REDIS_HOST=redis
+    env_file:
+      - ./Backend/.env
 
   worker:
     build: ./Backend
@@ -34,6 +34,8 @@ services:
     volumes:
       - ./Backend:/app
       - /app/node_modules
+    env_file:
+      - ./Backend/.env   
 
   frontend:
     build: ./frontend
