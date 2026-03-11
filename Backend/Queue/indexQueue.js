@@ -9,6 +9,10 @@ let connection = {
 
 let indexQueue = new Queue("indexQueue", {
     connection,
+      limiter: {
+        max: 10,
+        duration: 1000
+    },
     defaultJobOptions: {
         attempts: 3,
         backoff: {

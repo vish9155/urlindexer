@@ -7,6 +7,7 @@ import dbConect from './Config/db.js'
 import urlRoutes from './Routes/urlRoutes.js'
 import errormidd from './middlewares/errormiddleware.js'
 import { autositemapGenerator } from './Services/autositemapGenerator.js'
+import { startIndexCheckCron } from './Services/indexStatusCron.js'
 
 let app = express()
 app.use(express.json())
@@ -30,7 +31,7 @@ app.options("*", cors());
 // Database connection
 dbConect()
 
-
+startIndexCheckCron()
 app.use("/url", urlRoutes)
 
 console.log("Sitemap Auto Generator Started")

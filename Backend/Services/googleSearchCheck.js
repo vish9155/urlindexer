@@ -1,19 +1,23 @@
 export let googleSearchCheck = async (url) => {
 
-    let query = `https://www.google.com/search?q=site:${url}`
+    try {
 
-    let res = await fetch(query, {
-        headers: {
-            "User-Agent": "Mozilla/5.0"
-        }
-    })
+        let query = `https://www.google.com/search?q=site:${url}`
 
-    let html = await res.text()
+        let res = await fetch(query, {
+            headers: {
+                "User-Agent": "Mozilla/5.0"
+            }
+        })
 
-    if (html.includes(url)) {
-        console.log("Indexed")
-    } else {
-        console.log("Not Indexed Yet")
+        let html = await res.text()
+
+        return html.includes(url)
+
+    } catch (error) {
+
+        console.log("Google search check failed:", error.message)
+
+        return false
     }
-
 }
