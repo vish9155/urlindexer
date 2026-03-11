@@ -26,7 +26,7 @@ let worker = new Worker("indexQueue", async (job) => {
         await rssPing(url)
         await googleIndexer(url)
 
-        await new Promise(resolve => setTimeout(resolve, 60000))
+       await new Promise(resolve => setTimeout(resolve, 20000))
         let indexed = false
 
         try {
