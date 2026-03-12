@@ -1,34 +1,48 @@
 export let indexNow = async (url) => {
 
-    let host = new URL(url).hostname
+    try {
 
-    let endpoints = [
-        "https://api.indexnow.org/indexnow",
-        "https://www.bing.com/indexnow"
-    ]
+        let domain = new URL(url).origin
+        let host = new URL(url).hostname
+        console.log("host==",host)
+        let payload = {
+            host: host,
+            key: "c49d48ca44684f069b4582ce46c495f7",
+            keyLocation: `${domain}/c49d48ca44684f069b4582ce46c495f7.txt`,
+            urlList: [url]
+        }
 
-    for (let endpoint of endpoints) {
+        let endpoints = [
+            "https://api.indexnow.org/indexnow",
+            "https://www.bing.com/indexnow"
+        ]
 
-        try {
+        for (let endpoint of endpoints) {
 
-            await fetch(endpoint, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
-                },
-                body: JSON.stringify({
-                    host: host,
-                    key: "6548644772b34d88888686a81e0835a6",
-                    urlList: [url]
+            try {
+
+                let res = await fetch(endpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
                 })
-            })
 
-        } catch (error) {
+                console.log("IndexNow response:", res.status)
 
-            console.log("IndexNow Failed:", error.message)
+            } catch (error) {
+
+                console.log("IndexNow Failed:", error.message)
+
+            }
 
         }
 
+    } catch (error) {
+
+        console.log("IndexNow Error:", error.message)
+
     }
+
 }

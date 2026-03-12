@@ -12,7 +12,7 @@ export let singleurl = async (req, resp) => {
                 message: "Url already exists"
             })
         }
-        let newurls = await urls.create({ url })
+        let newurls = await urls.create({ url, status:"pending" })
 
         await indexQueue.add("index-job", {
             id: newurls._id,
