@@ -7,6 +7,9 @@ import { sitemapPing } from "../Services/sitemapPing.js"
 import { rssPing } from '../Services/rssPing.js'
 import urls from '../Model/Url.js'
 import dbConect from '../Config/db.js'
+import { crawlBooster } from '../Services/autoCrawl.js'
+import { backlinkGenerator } from '../Services/backlinkping.js'
+import { referrerPing } from '../Services/referPing.js'
 // import { googleSearchConsole } from '../Services/googleSearchconsole.js'
 // import { googleSearchCheck } from '../Services/googleSearchCheck.js'
 console.log("Indexer Worker Running")
@@ -19,12 +22,17 @@ let worker = new Worker("indexQueue", async (job) => {
     try {
 
         await urls.findByIdAndUpdate(id, { status: "processing" })
-        await indexNow(url)
-        await sitemapPing(url)
-        await rssPing(url)
+        await Promise.all([
+            crawlBooster(url),
+            backlinkGenerator(url),
+            indexNow(url),
+            sitemapPing(url),
+            rssPing(url),
+            referrerPing(url)
+        ])
         // await googleIndexer(url)
 
-       await new Promise(resolve => setTimeout(resolve, 20000))
+        await new Promise(resolve => setTimeout(resolve, 20000))
         // let indexed = false
 
         // try {
@@ -61,11 +69,11 @@ let worker = new Worker("indexQueue", async (job) => {
         //     console.log("URL Not Indexed:", url)
 
         // }
-        await urls.findByIdAndUpdate(id,{
-            status:"submitted"
+        await urls.findByIdAndUpdate(id, {
+            status: "submitted"
         })
 
-        console.log("Submitted:",url)
+        console.log("Submitted:", url)
 
 
     } catch (error) {

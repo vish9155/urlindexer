@@ -12,13 +12,15 @@ export let singleurl = async (req, resp) => {
                 message: "Url already exists"
             })
         }
-        let newurls = await urls.create({ url, status:"pending" })
+        let newurls = await urls.create({ url, status: "pending" })
 
         await indexQueue.add("index-job", {
             id: newurls._id,
             url: url
         }, {
-            priority: 1
+            priority: 1,
+            attempts: 3,
+            backoff: { type: "exponential", delay: 10000 }
         })
         resp.json({
             success: true,
