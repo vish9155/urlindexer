@@ -28,7 +28,5 @@ console.log("Indexed:",u.url)
 }
 
 }
-
 })
-
 }
