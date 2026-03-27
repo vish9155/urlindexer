@@ -11,9 +11,13 @@ import { crawlBooster } from '../Services/autoCrawl.js'
 import { backlinkGenerator } from '../Services/backlinkping.js'
 import { referrerPing } from '../Services/referPing.js'
 import { getRedisConnection } from '../utils/redisConfig.js'
+import { recoverPendingUrls } from '../Services/recoverPendingUrls.js'
 console.log("Indexer Worker Running")
 
 dbConect()
+recoverPendingUrls().catch((error) => {
+    console.log("Worker recovery failed:", error.message)
+})
 
 let worker = new Worker("indexQueue", async (job) => {
     console.log("Job Recieved", job.data)
@@ -92,5 +96,9 @@ worker.on("completed", (job) => {
 worker.on("failed", (job, err) => {
     console.log(` Job id is___ ${job?.id} failed on attempt ${job?.attemptsMade}:`, err.message);
 });
+
+worker.on("error", (err) => {
+    console.log("Worker connection error:", err.message)
+})
 
 

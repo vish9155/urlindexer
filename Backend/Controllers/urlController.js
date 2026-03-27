@@ -1,5 +1,5 @@
 import urls from "../Model/Url.js";
-import indexQueue from "../Queue/indexQueue.js";
+import { enqueueUrlJob } from "../Services/enqueueUrlJob.js";
 
 export let singleurl = async (req, resp) => {
     try {
@@ -14,14 +14,7 @@ export let singleurl = async (req, resp) => {
         }
         let newurls = await urls.create({ url, status: "pending" })
 
-        await indexQueue.add("index-job", {
-            id: newurls._id,
-            url: url
-        }, {
-            priority: 1,
-            attempts: 5,
-            backoff: { type: "exponential", delay: 30000 }
-        })
+        await enqueueUrlJob(newurls)
         resp.json({
             success: true,
             message: "URL added to queue",
@@ -31,7 +24,7 @@ export let singleurl = async (req, resp) => {
         })
 
     } catch (error) {
-        resp.json({ message: "Problem in Adding the new url", error, status: false })
+        resp.status(500).json({ message: "Problem in Adding the new url", error: error.message, status: false })
     }
 
 }
@@ -95,14 +88,7 @@ export let retryUrl = async (req, resp) => {
             lastError: null
         })
 
-        await indexQueue.add("index-job", {
-            id: record._id,
-            url: record.url
-        }, {
-            priority: 1,
-            attempts: 5,
-            backoff: { type: "exponential", delay: 30000 }
-        })
+        await enqueueUrlJob(record)
 
         resp.json({
             success: true,

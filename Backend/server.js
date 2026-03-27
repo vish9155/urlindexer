@@ -8,6 +8,7 @@ import urlRoutes from './Routes/urlRoutes.js'
 import errormidd from './middlewares/errormiddleware.js'
 import { autositemapGenerator } from './Services/autositemapGenerator.js'
 import {  startStatusCron } from './Services/indexStatusCron.js'
+import { recoverPendingUrls } from './Services/recoverPendingUrls.js'
 
 let app = express()
 app.use(express.json())
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }))
 //cors issue fixed
 app.use(cors({
     origin: [
+        "http://localhost:5174",
         "http://localhost:3000",
         "http://usrailwaybooking.com",
         "https://usrailwaybooking.com"
@@ -31,6 +33,9 @@ app.use(cors({
 dbConect()
 
 startStatusCron()
+recoverPendingUrls().catch((error) => {
+    console.log("Pending URL recovery failed:", error.message)
+})
 app.use("/url", urlRoutes)
 
 console.log("Sitemap Auto Generator Started")
