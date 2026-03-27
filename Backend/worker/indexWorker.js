@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 import { Worker } from 'bullmq'
 import { indexNow } from '../Services/indexNow.js'
-// import { googleIndexer } from '../Services/googleIndex.js'
+import { googleIndexer } from '../Services/googleIndex.js'
 import { sitemapPing } from "../Services/sitemapPing.js"
 import { rssPing } from '../Services/rssPing.js'
 import urls from '../Model/Url.js'
@@ -10,8 +10,6 @@ import dbConect from '../Config/db.js'
 import { crawlBooster } from '../Services/autoCrawl.js'
 import { backlinkGenerator } from '../Services/backlinkping.js'
 import { referrerPing } from '../Services/referPing.js'
-// import { googleSearchConsole } from '../Services/googleSearchconsole.js'
-// import { googleSearchCheck } from '../Services/googleSearchCheck.js'
 console.log("Indexer Worker Running")
 
 dbConect()
@@ -22,55 +20,26 @@ let worker = new Worker("indexQueue", async (job) => {
     try {
 
         await urls.findByIdAndUpdate(id, { status: "processing" })
-        await Promise.all([
+        let submissionSteps = await Promise.allSettled([
             crawlBooster(url),
             backlinkGenerator(url),
+            googleIndexer(url),
             indexNow(url),
             sitemapPing(url),
             rssPing(url),
             referrerPing(url)
         ])
-        // await googleIndexer(url)
 
-        await new Promise(resolve => setTimeout(resolve, 20000))
-        // let indexed = false
+        let rejectedSteps = submissionSteps.filter(step => step.status === "rejected")
 
-        // try {
+        if (rejectedSteps.length === submissionSteps.length) {
+            throw new Error("All indexing submissions failed")
+        }
 
-        //     let result = await googleSearchConsole(url)
-
-        //     if (result.coverageState?.toLowerCase().includes("indexed")) {
-        //         indexed = true
-        //     }
-
-        // } catch (err) {
-
-        //     console.log("GoogleSearchConsole failed, using Google search fallback")
-
-        //     indexed = await googleSearchCheck(url)
-
-        // }
-
-        // if (indexed) {
-
-        //     await urls.findByIdAndUpdate(id, {
-        //         status: "indexed",
-        //         indexedAt: new Date()
-        //     })
-
-        //     console.log("URL Indexed:", url)
-
-        // } else {
-
-        //     await urls.findByIdAndUpdate(id, {
-        //         status: "not-indexed"
-        //     })
-
-        //     console.log("URL Not Indexed:", url)
-
-        // }
         await urls.findByIdAndUpdate(id, {
-            status: "submitted"
+            status: "submitted",
+            submittedAt: new Date(),
+            lastError: rejectedSteps[0]?.reason?.message || null
         })
 
         console.log("Submitted:", url)
@@ -80,7 +49,7 @@ let worker = new Worker("indexQueue", async (job) => {
         console.log("Worker error", error.message)
         await urls.findByIdAndUpdate(id, {
             status: "failed",
-
+            lastError: error.message
         })
     }
 },

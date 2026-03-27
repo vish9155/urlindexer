@@ -2,7 +2,7 @@ export let googleSearchCheck =async (url) => {
 
  try {
 
-  let query = `https://www.google.com/search?q=site:${url}`
+  let query = `https://www.google.com/search?q=${encodeURIComponent(`site:${url}`)}`
 
   let res = await fetch(query, {
    headers: {
@@ -10,9 +10,13 @@ export let googleSearchCheck =async (url) => {
    }
   })
 
+  if (!res.ok) {
+   throw new Error(`Google search returned ${res.status}`)
+  }
+
   let html = await res.text()
 
-  if (html.includes(url)) {
+  if (html.includes(url) && !html.toLowerCase().includes("unusual traffic")) {
 
    console.log("Instant Indexed:", url)
 

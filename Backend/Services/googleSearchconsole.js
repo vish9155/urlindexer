@@ -1,7 +1,13 @@
 import { google } from "googleapis"
+import path from "path"
+import { fileURLToPath } from "url"
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const serviceAccountPath = path.resolve(__dirname, "..", "service-account.json")
 
 let auth = new google.auth.GoogleAuth({
-    keyFile: "service-account.json",
+    keyFile: serviceAccountPath,
     scopes: ["https://www.googleapis.com/auth/webmasters"]
 })
 
@@ -33,7 +39,7 @@ export let googleSearchConsole = async (url) => {
 
         console.log("Error in Google Search Console:", error.message)
 
-        return null
+        throw error
 
     }
 

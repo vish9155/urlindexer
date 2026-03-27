@@ -1,25 +1,29 @@
 import { google } from 'googleapis'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const serviceAccountPath = path.resolve(__dirname, "..", "service-account.json")
 
 export let googleIndexer = async (url) => {
-    try {
-        let auth = new google.auth.GoogleAuth({
-            keyFile: 'service-account.json',
-            scopes: ['https://www.googleapis.com/auth/indexing']
-        })
+    let auth = new google.auth.GoogleAuth({
+        keyFile: serviceAccountPath,
+        scopes: ['https://www.googleapis.com/auth/indexing']
+    })
 
-        let client = await auth.getClient()
-        let indexing = google.indexing({
-            version: "v3",
-            auth: client
-        })
-        await indexing.urlNotifications.publish({
-            requestBody: {
-                url: url,
-                type: "URL_UPDATED"
-            }
-        })
-    }
-    catch (error) {
-        console.log("Error in Google Indexing api", error.message)
-    }
+    let client = await auth.getClient()
+    let indexing = google.indexing({
+        version: "v3",
+        auth: client
+    })
+
+    let response = await indexing.urlNotifications.publish({
+        requestBody: {
+            url: url,
+            type: "URL_UPDATED"
+        }
+    })
+
+    return response?.data ?? null
 }
