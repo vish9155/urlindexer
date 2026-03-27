@@ -1,11 +1,9 @@
 import dotenv from 'dotenv'
 dotenv.config()
 import { Queue } from "bullmq"
+import { getRedisConnection } from '../utils/redisConfig.js'
 
-let connection = {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT
-}
+let connection = getRedisConnection()
 
 let indexQueue = new Queue("indexQueue", {
     connection,
@@ -17,7 +15,7 @@ let indexQueue = new Queue("indexQueue", {
         attempts: 3,
         backoff: {
             type: 'exponential',
-            delay: 5000
+            delay: 30000
         },
         removeOnComplete: {
             age: 3600,

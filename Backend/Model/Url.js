@@ -7,7 +7,8 @@ let urlschema = await mongoose.Schema({
     indexedAt: { type: Date },
     submittedAt: { type: Date },
     lastCheckedAt: { type: Date },
-    lastError: { type: String }
+    lastError: { type: String },
+    lastSubmissionSummary: [{ type: String }]
 }, { timestamps: true })
 
 let urls = await mongoose.model("url", urlschema, "url")

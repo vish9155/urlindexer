@@ -15,6 +15,8 @@ status:"submitted"
 
 for(let u of list){
 
+try{
+
 let indexed = false
 
 try{
@@ -27,7 +29,8 @@ indexed = await googleSearchCheck(u.url)
 }
 
 await urls.findByIdAndUpdate(u._id,{
-lastCheckedAt:new Date()
+lastCheckedAt:new Date(),
+lastError:null
 })
 
 if(indexed){
@@ -43,6 +46,14 @@ console.log("Indexed:",u.url)
 
 else{
 console.log("Still not indexed:",u.url)
+}
+
+}catch(error){
+console.log("Status check failed:", u.url, error.message)
+await urls.findByIdAndUpdate(u._id,{
+lastCheckedAt:new Date(),
+lastError:error.message
+})
 }
 
 }
